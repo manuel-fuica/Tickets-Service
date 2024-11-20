@@ -3,6 +3,7 @@ const path = require('path');
 const Usuario = require('./models/user');
 const Tablero = require('./models/tablero');
 const Tickets = require('./models/tickets');
+const { getTableros } = require('./config/config');
 
 
 //middlewares
@@ -86,8 +87,12 @@ const cargaInicial = async () => {
 //Endpoints 
 
 //ruta pra mostrar la vista
-app.get('/', (req, res) => {
+app.get('/signin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'vistas', 'index.html'));
+});
+
+app.get('/', (req, res) => {
+    res.redirect('/signin');
 });
 
 app.get('/signup', (req, res) => {
@@ -97,6 +102,18 @@ app.get('/signup', (req, res) => {
 app.get('/home', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'vistas', 'home.html'));
 });
+
+app.get('/tableros', async (req, res) => {
+    try {
+        const tableros = await getTableros();
+        res.json(tableros);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al obtener los tableros' });
+    }
+});
+
+
 
 //ruta para crear un nuevo usuario
 app.post('/signup', async (req, res) => {

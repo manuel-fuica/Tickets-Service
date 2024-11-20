@@ -1,4 +1,4 @@
-const pool = require('../config/config');
+const { pool } = require('../config/config');
 const { crearUsuario } = require('../config/config');
 
 

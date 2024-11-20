@@ -109,9 +109,18 @@ const crearTicket = async (titulo, descripcion, estado, fecha_creacion, fecha_ci
 };
 
 
+const getTableros = async () => {
+    try {
+        const query = `SELECT * FROM tablero`;
+        const result = await pool.query(query);
+        return result.rows;
+    } catch (error) {
+        console.error(error);
+    }
+};
 
 
 
 //crearTablas();// Llamar a la función para crear las tablas
 
-module.exports = { pool, crearUsuario, crearTablero, crearTicket };
+module.exports = { pool, crearUsuario, crearTablero, crearTicket, getTableros };
