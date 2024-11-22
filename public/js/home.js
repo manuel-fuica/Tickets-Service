@@ -10,7 +10,7 @@ fetch('/tableros')
 
         tableros.forEach(tablero => {
             const tableroHTML = `
-        <div class="col-md-4 mb-4">
+        <div class="col-12 mb-4">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">${tablero.nombre}</h5>
