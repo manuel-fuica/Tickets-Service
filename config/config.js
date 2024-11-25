@@ -119,20 +119,15 @@ const getTableros = async () => {
     }
 };
 
-const getTableroId = async (id) => {
+const getTickets = async (id) => {
     try {
-        const query = `SELECT id FROM tablero WHERE id = $1`;
+        const query = `SELECT id, titulo, descripcion, estado, fecha_creacion, fecha_cierre, tablero_id, usuario_id
+        FROM ticket
+        WHERE tablero_id = $1;`;
         const result = await pool.query(query, [id]);
-        return result.rows[0].id;
-    } catch (error) {
-        console.error(error);
-    }
-};
-
-const getTickets = async () => {
-    try {
-        const query = `SELECT * FROM ticket WHERE tablero_id = $1`;
-        const result = await pool.query(query, [id]);
+        if (result.rows.length === 0) {
+            throw new Error('No se encontraron tickets');
+        }
         return result.rows;
     } catch (error) {
         console.error(error);
@@ -143,4 +138,4 @@ const getTickets = async () => {
 
 //crearTablas();// Llamar a la función para crear las tablas
 
-module.exports = { pool, crearUsuario, crearTablero, crearTicket, getTableros, getTickets, getTableroId };
+module.exports = { pool, crearUsuario, crearTablero, crearTicket, getTableros, getTickets };

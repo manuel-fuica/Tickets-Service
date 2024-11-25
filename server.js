@@ -3,7 +3,7 @@ const path = require('path');
 const Usuario = require('./models/user');
 const Tablero = require('./models/tablero');
 const Tickets = require('./models/tickets');
-const { getTableros, getTableroId } = require('./config/config');
+const { getTableros, getTickets } = require('./config/config');
 
 
 //middlewares
@@ -116,11 +116,11 @@ app.get('/tableros', async (req, res) => {
 app.get('/tablero/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const tablero = await getTableroId(id);
-        res.json(tablero);
+        const ticketsTablero = await getTickets(id);
+        res.json(ticketsTablero);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error al obtener el tablero' });
+        res.status(500).json({ message: 'Error al obtener los tickets del tablero' });
     }
 })
 
