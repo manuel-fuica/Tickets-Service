@@ -125,10 +125,36 @@ const getTickets = async (id) => {
         FROM ticket
         WHERE tablero_id = $1;`;
         const result = await pool.query(query, [id]);
-        if (result.rows.length === 0) {
-            throw new Error('No se encontraron tickets');
-        }
         return result.rows;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const updateEstadoTicket = async (idTicket, nuevoEstado, fechaCierre, fechaCreacion) => {
+    try {
+        let query = '';
+        let result;
+        if (nuevoEstado === 'pendiente') {
+            query = `UPDATE ticket
+        SET estado = $1
+        WHERE id = $2;`;
+            result = await pool.query(query, [nuevoEstado, idTicket]);
+        } else if (nuevoEstado === 'cerrado') {
+            query = `UPDATE ticket
+        SET estado = $1, fecha_cierre = $2
+        WHERE id = $3;`;
+            result = await pool.query(query, [nuevoEstado, fechaCierre, idTicket]);
+        } else if (nuevoEstado === 'abierto') {
+            query = `UPDATE ticket
+        SET estado = $1, fecha_creacion = $2, fecha_cierre = NULL
+        WHERE id = $3;`;
+            result = await pool.query(query, [nuevoEstado, fechaCreacion, idTicket]);
+        }
+        if (result.rowCount === 0) {
+            throw new Error('No se pudo actualizar el estado del ticket');
+        }
+        return { message: 'Estado del ticket actualizado correctamente' };
     } catch (error) {
         console.error(error);
     }
@@ -138,4 +164,4 @@ const getTickets = async (id) => {
 
 //crearTablas();// Llamar a la función para crear las tablas
 
-module.exports = { pool, crearUsuario, crearTablero, crearTicket, getTableros, getTickets };
+module.exports = { pool, crearUsuario, crearTablero, crearTicket, getTableros, getTickets, updateEstadoTicket };

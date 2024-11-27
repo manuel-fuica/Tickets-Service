@@ -3,7 +3,7 @@ const path = require('path');
 const Usuario = require('./models/user');
 const Tablero = require('./models/tablero');
 const Tickets = require('./models/tickets');
-const { getTableros, getTickets } = require('./config/config');
+const { getTableros, getTickets, updateEstadoTicket } = require('./config/config');
 
 
 //middlewares
@@ -168,6 +168,27 @@ app.post('/signin', async (req, res) => {
         res.status(500).json({ error: 'Error al iniciar sesión' });
     }
 })
+
+app.post('/ticket/:id/estado', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { estado } = req.body;
+        let fechaCierre = null;
+        let fechaCreacion = null;
+        if (estado === 'cerrado') {
+            fechaCierre = new Date().toISOString();
+        } else if (estado === 'abierto') {
+            fechaCreacion = new Date().toISOString();
+        }
+        const resultado = await updateEstadoTicket(id, estado, fechaCierre, fechaCreacion);
+        res.status(200).json({ resultado });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al actualizar el estado del ticket' });
+    }
+});
+
+
 
 
 
