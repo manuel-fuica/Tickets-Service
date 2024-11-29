@@ -3,7 +3,7 @@ const path = require('path');
 const Usuario = require('./models/user');
 const Tablero = require('./models/tablero');
 const Tickets = require('./models/tickets');
-const { getTableros, getTickets, updateEstadoTicket } = require('./config/config');
+const { getTableros, getTickets, updateEstadoTicket, getUserName, crearTicket } = require('./config/config');
 
 
 //middlewares
@@ -103,6 +103,10 @@ app.get('/home', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'vistas', 'home.html'));
 });
 
+app.get('/nuevoTicket', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'vistas', 'nuevoTicket.html'));
+});
+
 app.get('/tableros', async (req, res) => {
     try {
         const tableros = await getTableros();
@@ -125,21 +129,22 @@ app.get('/tablero/:id', async (req, res) => {
 })
 
 //crear ticket
-app.post('/ticket', async (req, res) => {
-    try {
-        const { titulo, descripcion, estado, fecha_creacion, fecha_cierre, tablero_id, usuario_id } = req.body;
+app.post('/crearTicket', async (req, res) => {
+  try {
+    const { titulo, descripcion, usuario_id } = req.body;
+    const tablero_id = localStorage.getItem('tableroId'); // obtener el id_tablero de localStorage
 
-        // Validación de datos de entrada
-        if (!titulo || !descripcion || !estado || !fecha_creacion || !tablero_id || !usuario_id) {
-            return res.status(400).json({ error: 'Faltan campos requeridos' });
-        }
-
-        const nuevoTicket = await new Tickets().create(titulo, descripcion, estado, fecha_creacion, fecha_cierre, tablero_id, usuario_id);
-        res.status(201).json({ message: 'Ticket creado correctamente', nuevoTicket });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: `Error al crear el ticket: ${error.message}` });
+    // Validación de datos de entrada
+    if (!titulo || !descripcion || !usuario_id) {
+      return res.status(400).json({ error: 'Faltan campos requeridos' });
     }
+
+    const nuevoTicket = await crearTicket(titulo, descripcion, tablero_id, usuario_id);
+    res.status(201).json({ message: 'Ticket creado correctamente', nuevoTicket });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: `Error al crear el ticket: ${error.message}` });
+  }
 });
 
 
@@ -185,6 +190,16 @@ app.post('/ticket/:id/estado', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al actualizar el estado del ticket' });
+    }
+});
+
+app.get('/api/usuario/nombre', async (req, res) => {
+    try {
+        const nombre = await getUserName(req);
+        res.json({ nombre });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: 'Error al obtener el nombre del usuario' });
     }
 });
 

@@ -1,8 +1,99 @@
-.img-principal {
-  transition: opacity 1s ease-in-out;
-  opacity: 1;
+/* Estilos generales */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
 }
 
-.img-principal.ocultar {
-  opacity: 0;
+.container {
+  margin-top: 20px;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.card-body {
+  padding: 15px;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.card-text {
+  font-size: 1rem;
+  color: #555;
+}
+
+.btn {
+  margin-top: 10px;
+}
+
+/* Estilo para los tickets */
+#tickets-container {
+  margin-top: 30px;
+}
+
+.card.mb-3.p-2 {
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 15px;
+}
+
+.card h5 {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.card h6 {
+  font-size: 1rem;
+  color: #555;
+}
+
+.input-group {
+  margin-top: 10px;
+}
+
+.form-select {
+  width: auto;
+  margin-right: 10px;
+}
+
+.mensaje-no-hay-tickets {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  color: #888;
+}
+
+/* Para ocultar la imagen principal mientras se ven los tickets */
+.img-principal {
+  display: block;
+  max-width: 100%;
+}
+
+/* Para los tickets cerrados */
+.card.cerrado {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+
+.card.pendiente {
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+}
+
+.card.abierto {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+/* Ocultar tickets container cuando no hay tickets */
+.hidden {
+  display: none;
 }

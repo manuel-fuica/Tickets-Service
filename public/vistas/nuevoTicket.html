@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Ticket</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
+</head>
+<body>
+    <header class="bg-primary text-white text-center py-4">
+        <h1>Bienvenido a Tickets Service</h1>
+        <header class="bg-primary text-white py-4 d-flex justify-content-between align-items-center">
+            <button class="btn btn-success m-3" id="nuevo-ticket" title="Nuevo Ticket">
+                Usuario <i class="bi bi-person fs-5"></i>
+            </button>
+        </header>
+    </header>
+    <main>
+        <div class="container mx-auto m-3 p-3 mb-5 bg-white rounded border">
+            <h1>Nuevo Ticket</h1>
+            <form>
+                <div class="form-group">
+                    <label for="usuario_id">ID del usuario</label>
+                    <input type="text" class="form-control" id="usuario_id" placeholder="Ingrese el ID del usuario">
+                </div>
+                <div class="form-group">
+                    <label for="titulo">Título del ticket</label>
+                    <input type="text" class="form-control" id="titulo" placeholder="Ingrese el título del ticket">
+                </div>
+                <div class="form-group">
+                    <label for="descripcion">Descripción del ticket</label>
+                    <textarea class="form-control" id="descripcion" placeholder="Ingrese la descripción del ticket"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Crear Ticket</button>
+                <button type="button" class="btn btn-primary m-3" id="cancelar" onclick="volver()">Volver</button>
+            </form>
+        </div>
+    </main>
+    <footer class="fixed-bottom text-center py-3">
+        <p>&copy; 2024 Tickets-Service. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="../js/nuevoTicket.js"></script>
+</body>
+</html>

@@ -98,14 +98,17 @@ const crearTablero = async (nombre, descripcion, usuario_id) => {
     }
 };
 
-const crearTicket = async (titulo, descripcion, estado, fecha_creacion, fecha_cierre, tablero_id, usuario_id) => {
-    try {
-        const query = `INSERT INTO ticket (titulo, descripcion, estado, fecha_creacion, fecha_cierre, tablero_id, usuario_id) VALUES ($1, $2, $3, $4, $5, $6, $7)`;
-        await pool.query(query, [titulo, descripcion, estado, fecha_creacion, fecha_cierre, tablero_id, usuario_id]);
-        console.log('Ticket creado');
-    } catch (error) {
-        console.error(error);
-    }
+const crearTicket = async (titulo, descripcion, tablero_id, usuario_id) => {
+  try {
+    const fecha_creacion = new Date().toISOString();
+    const estado = 'abierto';
+    const fecha_cierre = null;
+    const query = `INSERT INTO ticket (titulo, descripcion, estado, fecha_creacion, fecha_cierre, tablero_id, usuario_id) VALUES ($1, $2, $3, $4, $5, $6, $7)`;
+    await pool.query(query, [titulo, descripcion, estado, fecha_creacion, fecha_cierre, tablero_id, usuario_id]);
+    console.log('Ticket creado');
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 
@@ -160,8 +163,25 @@ const updateEstadoTicket = async (idTicket, nuevoEstado, fechaCierre, fechaCreac
     }
 };
 
+const getUserName = async (req) => {
+  try {
+    const id = req.query.id; // obtener el ID del usuario de la query
+    if (!id) {
+      throw new Error('No se proporcionó un ID de usuario');
+    }
+    const query = `SELECT nombre FROM usuarios WHERE id = $1;`;
+    const result = await pool.query(query, [id]);
+    return result.rows[0].nombre;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+
+
 
 
 //crearTablas();// Llamar a la función para crear las tablas
 
-module.exports = { pool, crearUsuario, crearTablero, crearTicket, getTableros, getTickets, updateEstadoTicket };
+module.exports = { pool, crearUsuario, crearTablero, crearTicket, getTableros, getTickets, updateEstadoTicket, getUserName, crearTicket};

@@ -12,20 +12,40 @@ fetch('/tableros')
 
         tableros.forEach(tablero => {
             const tableroHTML = `
-        <div class="col-12 mb-2">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">${tablero.nombre}</h5>
-              <p class="card-text">${tablero.descripcion}</p>
-              <button class="btn btn-primary" id="ver-tickets-${tablero.id}" onclick="verTickets(${tablero.id})">Ver tickets</button>
+            <div class="col-12 mb-2">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Tablero: ${tablero.nombre}</h5>
+                  <p class="card-text">${tablero.descripcion}</p>
+                  <button class="btn btn-primary" id="ver-tickets-${tablero.id}" onclick="verTickets(${tablero.id})">Ver tickets</button>
+                  <button class="btn btn-success nuevo-ticket" id="nuevo-ticket-${tablero.id}" title="Nuevo Ticket" data-tablero-id="${tablero.id}" onclick="rutaNuevoTicket(event)">Nuevo Ticket</button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      `;
+          `;
             tablerosDiv.innerHTML += tableroHTML;
         });
     })
     .catch(error => console.error('Error:', error));
+
+function rutaNuevoTicket(event) {
+  const tableroId = event.target.getAttribute('data-tablero-id');
+  console.log('ID del tablero:', tableroId);
+  localStorage.setItem('tableroId', tableroId);
+  fetch('http://localhost:3000/nuevoticket')
+    .then((response) => {
+      if (response.ok) {
+        window.location.href = '/nuevoticket';
+      } else {
+        console.error('Error al llegar al endpoint');
+      }
+    })
+    .catch((error) => {
+      console.error('Error al hacer el fetch:', error);
+    });
+}
+
+
 
 // Función para ver los tickets de un tablero
 function verTickets(id) {
@@ -33,14 +53,17 @@ function verTickets(id) {
     document.querySelector('.img-principal').style.display = 'none';
 
     const ticketsContainer = document.getElementById("tickets-container");
-    ticketsContainer.innerHTML = ''; // limpia el contenedor
+    ticketsContainer.innerHTML = ''; // Limpia el contenedor
 
     // Obtener tickets del tablero
     fetch(`/tablero/${id}`)
         .then(response => response.json())
         .then(tickets => {
             if (tickets.length === 0) {
-                ticketsContainer.innerHTML = `<h2>No hay tickets para ver</h2><p>No hay tickets registrados para el tablero seleccionado.</p>`;
+                ticketsContainer.innerHTML = `
+                    <h2>No hay tickets para ver</h2>
+                    <p>No hay tickets registrados para el tablero seleccionado.</p>`;
+                verificarSiHayTickets();  // Solo se llama aquí
             } else {
                 const tableroNombre = tableros.find(tablero => tablero.id === id).nombre;
                 const htmlTickets = `
@@ -48,12 +71,12 @@ function verTickets(id) {
                     <div class="w-100">
                       <div class="list-group">
                         ${tickets.map(ticket => `
-                          <div class="card mb-3 p-2" data-ticket-id="${ticket.id}">
+                          <div class="card mb-3 p-2 ${ticket.estado}" data-ticket-id="${ticket.id}">
                             <h6>Fecha de creación: ${new Date(ticket.fecha_creacion).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</h6>
                             ${ticket.fecha_cierre ? `<h6 id="fecha-cierre-${ticket.id}">Fecha de cierre: ${new Date(ticket.fecha_cierre).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</h6>` : ''}
                             <span>Estado: ${ticket.estado.toUpperCase()}</span>
                             <h5>Asunto: ${ticket.titulo}</h5>
-                            <span>Descripcion: </span>
+                            <span>Descripción:</span>
                             <p>${ticket.descripcion}</p>
                             <div class="row">
                               <div class="input-group">
@@ -62,7 +85,7 @@ function verTickets(id) {
                                   <option value="cerrado" ${ticket.estado === 'cerrado' ? 'selected' : ''}>Cerrado</option>
                                   <option value="pendiente" ${ticket.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
                                 </select>
-                                <button class="btn btn-primary" type="button" onclick="cambiarEstado(${ticket.id}, '${ticket.estado}')">Cambiar estado</button>
+                                <button class="btn btn-primary" type="button" onclick="cambiarEstado(${ticket.id})">Cambiar estado</button>
                               </div>
                             </div>
                           </div>
@@ -71,24 +94,23 @@ function verTickets(id) {
                     </div>
                   `;
                 ticketsContainer.innerHTML = htmlTickets;
-                verificarSiHayTickets();
+                verificarSiHayTickets();  // Aquí también
             }
         })
         .catch(error => console.error('Error al cargar los tickets:', error));
 }
 
 // Función para cambiar el estado de un ticket
-function cambiarEstado(id, estadoActual) {
+function cambiarEstado(id) {
     const select = document.querySelector(`#estado-${id}`);
     const nuevoEstado = select.value;
 
-    // Validación: si el estado no se ha seleccionado
-    if (!nuevoEstado) {
-        console.error("No se puede seleccionar 'Seleccionar' como estado");
-        return;
-    }
+    // Obtener el estado actual desde el DOM
+    const ticketDiv = document.querySelector(`.card[data-ticket-id="${id}"]`);
+    const estadoSpan = ticketDiv.querySelector('span');
+    const estadoActual = estadoSpan.textContent.split(':')[1].trim().toLowerCase();
 
-    // Validación para evitar cambiar a "cerrado" si ya está cerrado
+    // Validación: evitar cerrar un ticket ya cerrado
     if (estadoActual === 'cerrado' && nuevoEstado === 'cerrado') {
         alert("El ticket ya está cerrado. No se puede volver a cerrar.");
         return;
@@ -110,37 +132,39 @@ function cambiarEstado(id, estadoActual) {
             fechaCierre: fechaCierre
         })
     })
-    .then(response => {
-        if (response.ok) {
-            console.log('Estado del ticket actualizado correctamente');
-
-            // Obtener el ticket en el DOM
-            const ticketDiv = document.querySelector(`.card.mb-3.p-2[data-ticket-id="${id}"]`);
-            if (!ticketDiv) {
-                console.error('Ticket no encontrado');
-                return;
+        .then(response => {
+            if (response.ok) {
+                console.log('Estado del ticket actualizado correctamente');
+                actualizarDOMEstado(id, nuevoEstado, fechaCierre);
+            } else {
+                console.error('Error al actualizar el estado del ticket');
             }
+        })
+        .catch(error => console.error('Error al cambiar el estado del ticket:', error));
+}
 
-            // Actualizar el estado del ticket en el DOM
-            let estadoSpan = ticketDiv.querySelector('span');
-            estadoSpan.innerHTML = `Estado: ${nuevoEstado.toUpperCase()}`;
+// Función para actualizar el DOM después de cambiar el estado
+function actualizarDOMEstado(id, nuevoEstado, fechaCierre) {
+    const ticketDiv = document.querySelector(`.card[data-ticket-id="${id}"]`);
+    const estadoSpan = ticketDiv.querySelector('span');
+    estadoSpan.innerHTML = `Estado: ${nuevoEstado.toUpperCase()}`;
 
-            // Si el estado es cerrado, agregar la fecha de cierre
-            let fechaCierreSpanExistente = ticketDiv.querySelector(`#fecha-cierre-${id}`);
-            if (nuevoEstado === 'cerrado' && !fechaCierreSpanExistente) {
-                const nuevoFechaCierreSpan = document.createElement('h6');
-                nuevoFechaCierreSpan.id = `fecha-cierre-${id}`;
-                nuevoFechaCierreSpan.innerHTML = `Fecha de cierre: ${new Date(fechaCierre).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
-                ticketDiv.appendChild(nuevoFechaCierreSpan);
-            } else if ((nuevoEstado === 'abierto' || nuevoEstado === 'pendiente') && fechaCierreSpanExistente) {
-                // Eliminar la fecha de cierre si el estado es abierto o pendiente
-                fechaCierreSpanExistente.remove();
-            }
-        } else {
-            console.error('Error al actualizar el estado del ticket');
+    let fechaCierreSpan = ticketDiv.querySelector(`#fecha-cierre-${id}`);
+    if (nuevoEstado === 'cerrado') {
+        if (!fechaCierreSpan) {
+            const nuevoFechaCierreSpan = document.createElement('h6');
+            nuevoFechaCierreSpan.id = `fecha-cierre-${id}`;
+            nuevoFechaCierreSpan.innerHTML = `Fecha de cierre: ${new Date(fechaCierre).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+            const fechaCreacionSpan = ticketDiv.querySelector('h6');
+            fechaCreacionSpan.insertAdjacentElement('afterend', nuevoFechaCierreSpan);
         }
-    })
-    .catch(error => console.error('Error al cambiar el estado del ticket:', error));
+    } else if (fechaCierreSpan) {
+        // Eliminar la fecha de cierre si no está cerrado
+        fechaCierreSpan.remove();
+    }
+
+    // Cambiar la clase según el estado
+    ticketDiv.className = `card mb-3 p-2 ${nuevoEstado}`;
 }
 
 // Función para mostrar mensaje de no hay tickets
@@ -160,15 +184,11 @@ function ocultarMensajeNoHayTickets() {
     }
 }
 
-// Función para verificar si hay tickets
 function verificarSiHayTickets() {
-    const ticketDivs = document.querySelectorAll('.card.mb-3.p-2');
-    if (ticketDivs.length === 0) {
-        mostrarMensajeNoHayTickets();
-    } else {
-        ocultarMensajeNoHayTickets();
+    const ticketsContainer = document.getElementById("tickets-container");
+    if (!ticketsContainer.innerHTML.trim()) {
+        ticketsContainer.innerHTML = `
+            <h2>No hay tickets para ver</h2>
+            <p>No hay tickets registrados para el tablero seleccionado.</p>`;
     }
 }
-
-// Llamar a la función para verificar si hay tickets
-verificarSiHayTickets();
