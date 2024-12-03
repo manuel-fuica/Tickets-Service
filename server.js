@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const Usuario = require('./models/user');
-const Tablero = require('./models/tablero');
 const Tickets = require('./models/tickets');
 const { getTableros, getTickets, updateEstadoTicket, getUserName, crearTicket } = require('./config/config');
 
@@ -103,10 +102,6 @@ app.get('/home', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'vistas', 'home.html'));
 });
 
-app.get('/nuevoTicket', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'vistas', 'nuevoTicket.html'));
-});
-
 app.get('/tableros', async (req, res) => {
     try {
         const tableros = await getTableros();
@@ -129,28 +124,32 @@ app.get('/tablero/:id', async (req, res) => {
 })
 
 //crear ticket
+
+app.get('/nuevoTicket', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'vistas', 'nuevoTicket.html'));
+});
+
+
 app.post('/crearTicket', async (req, res) => {
-  try {
-    const { titulo, descripcion, usuario_id } = req.body;
-    const tablero_id = localStorage.getItem('tableroId'); // obtener el id_tablero de localStorage
+    try {
+        const { titulo, descripcion, usuario_id, tablero_id } = req.body;
 
-    // Validación de datos de entrada
-    if (!titulo || !descripcion || !usuario_id) {
-      return res.status(400).json({ error: 'Faltan campos requeridos' });
+        // Validación de datos de entrada
+        if (!titulo || !descripcion || !usuario_id || !tablero_id) {
+            return res.status(400).json({ error: 'Faltan campos requeridos' });
+        }
+
+        const nuevoTicket = await crearTicket(titulo, descripcion, tablero_id, usuario_id);
+        res.status(201).json({ message: 'Ticket creado correctamente', nuevoTicket });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: `Error al crear el ticket: ${error.message}` });
     }
-
-    const nuevoTicket = await crearTicket(titulo, descripcion, tablero_id, usuario_id);
-    res.status(201).json({ message: 'Ticket creado correctamente', nuevoTicket });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: `Error al crear el ticket: ${error.message}` });
-  }
 });
 
 
 //ruta para crear un nuevo usuario
 app.post('/signup', async (req, res) => {
-
     try {
         const { nombre, email, password } = req.body;
         const nuevoUsuario = await new Usuario().create(nombre, email, password);
@@ -159,18 +158,25 @@ app.post('/signup', async (req, res) => {
         console.error(error);
         res.status(500).json({ error: 'Error al crear el usuario' });
     }
-})
+});
+
 
 //ruta para iniciar sesion
-
 app.post('/signin', async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await new Usuario().findOne(email, password);
-        res.status(200).json({ message: 'Inicio de sesión exitoso', user });
+        if (!user) {
+            throw new Error('Email o contraseña incorrectos');
+        }
+        res.json({
+            message: 'Inicio de sesión exitoso',
+            nombreUsuario: user.nombre,
+            idUsuario: user.id
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error al iniciar sesión' });
+        res.status(500).json({ error: 'Error al iniciar sesión' });
     }
 })
 
@@ -202,10 +208,6 @@ app.get('/api/usuario/nombre', async (req, res) => {
         res.status(500).send({ message: 'Error al obtener el nombre del usuario' });
     }
 });
-
-
-
-
 
 
 app.listen(3000, () => {

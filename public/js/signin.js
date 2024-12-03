@@ -1,5 +1,3 @@
-
-
 document.getElementById('signinForm').addEventListener('submit', async (event) => {
     event.preventDefault();
 
@@ -17,6 +15,10 @@ document.getElementById('signinForm').addEventListener('submit', async (event) =
     const data = await response.json();
 
     if (response.ok) {
+        const nombreUsuario = data.nombreUsuario; // Obtén el nombre del usuario desde la respuesta
+        const idUsuario = data.idUsuario;
+        const usuario = { nombre: nombreUsuario, id: idUsuario };
+        sessionStorage.setItem('usuario', JSON.stringify(usuario)); // Almacena el nombre del usuario en la variable de sesión
         alert(data.message);
         window.location.href = './home';
     } else {

@@ -1,3 +1,20 @@
+const usuario = JSON.parse(sessionStorage.getItem('usuario'));
+const nombreUsuario = usuario.nombre;
+const elementoUsuario = document.getElementById('nombre-usuario');
+
+elementoUsuario.textContent = nombreUsuario;
+
+// Obtiene todos los elementos con la clase "cerrar-sesion" y agrega un evento de clic a cada uno
+const cerrarSesionButtons = document.querySelectorAll('.cerrar-sesion');
+for (let button of cerrarSesionButtons) {
+    button.addEventListener('click', function() {
+        // Elimina la sesión storage
+        sessionStorage.removeItem('usuario');
+        // Redirige al usuario a la vista de iniciar sesión
+        window.location.href = '/signin';
+    });
+}
+
 let tableros; // Declarar tableros en un ámbito más amplio
 
 const tablerosDiv = document.getElementById('tableros');
