@@ -1,3 +1,4 @@
+// Obtiene el nombre del usuario desde la variable de sesión storage y lo muestra en el elemento con el id "nombre-usuario"
 const usuario = JSON.parse(sessionStorage.getItem('usuario'));
 const nombreUsuario = usuario.nombre;
 const elementoUsuario = document.getElementById('nombre-usuario');
@@ -15,10 +16,11 @@ for (let button of cerrarSesionButtons) {
     });
 }
 
-let tableros; // Declarar tableros en un ámbito más amplio
-
+// Variable para almacenar los tableros
+let tableros;
 const tablerosDiv = document.getElementById('tableros');
 
+//funcion para volver a home
 function volver() {
   fetch('http://localhost:3000/home')
     .then((response) => {
@@ -33,16 +35,18 @@ function volver() {
     });
 }
 
+// Función para obtener el ID del tablero en el cual se hizo click en el boton Nuevo Ticket
 function obtenerTableroId() {
     console.log('Se está ejecutando la función obtenerTableroId');
     const tableroId = localStorage.getItem('tableroId');
-    console.log(tableroId); // debería mostrar el ID del tablero
+    console.log(tableroId);
 }
 
 window.addEventListener('load', obtenerTableroId);
 
 const form = document.querySelector('form');
 
+// Evento submit del formulario, para crear un ticket nuevo, y enviarlo al backend
 form.addEventListener('submit', (e) => {
   e.preventDefault();
   const titulo = document.querySelector('#titulo').value;

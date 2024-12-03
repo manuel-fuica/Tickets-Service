@@ -1,6 +1,7 @@
 const { Pool } = require('pg');
-const bcrypt = require('bcrypt');
 
+
+// Configuración de la conexión a la base de datos
 const pool = new Pool({
     user: 'postgres',
     host: 'localhost',
@@ -20,6 +21,7 @@ async function crearTablas() {
     }
 }
 
+// Funciones para crear las tablas
 async function crearTablaUsuario() {
     try {
         const query = `CREATE TABLE IF NOT EXISTS usuario (
@@ -35,6 +37,7 @@ async function crearTablaUsuario() {
     }
 }
 
+// Funciones para crear las tablas
 async function crearTablaTablero() {
     try {
         const query = `CREATE TABLE IF NOT EXISTS tablero (
@@ -73,7 +76,7 @@ async function crearTablaTicket() {
 }
 
 
-//crear usuario
+// Funciones para crear los registros (usuarios)
 const crearUsuario = async (nombre, email, password) => {
     if (!nombre) {
         throw new Error('Nombre es requerido');
@@ -88,7 +91,7 @@ const crearUsuario = async (nombre, email, password) => {
     }
 };
 
-
+// Funciones para crear los registros (tableros)
 const crearTablero = async (nombre, descripcion, usuario_id) => {
     try {
         const query = `INSERT INTO tablero (nombre, descripcion, usuario_id) VALUES ($1, $2, $3)`;
@@ -98,6 +101,8 @@ const crearTablero = async (nombre, descripcion, usuario_id) => {
         console.error(error);
     }
 };
+
+// Funciones para crear los registros (tickets)
 
 const crearTicket = async (titulo, descripcion, tablero_id, usuario_id) => {
     try {
@@ -112,7 +117,7 @@ const crearTicket = async (titulo, descripcion, tablero_id, usuario_id) => {
     }
 };
 
-
+// Funciones para obtener los registros (devuleve los tableros)
 const getTableros = async () => {
     try {
         const query = `SELECT * FROM tablero`;
@@ -123,6 +128,7 @@ const getTableros = async () => {
     }
 };
 
+// Funciones para obtener los registros (devuleve los tickets)
 const getTickets = async (id) => {
     try {
         const query = `SELECT id, titulo, descripcion, estado, fecha_creacion, fecha_cierre, tablero_id, usuario_id
@@ -135,6 +141,7 @@ const getTickets = async (id) => {
     }
 };
 
+// Funciones para actualizar el estado de un ticket
 const updateEstadoTicket = async (idTicket, nuevoEstado, fechaCierre, fechaCreacion) => {
     try {
         let query = '';
@@ -164,9 +171,10 @@ const updateEstadoTicket = async (idTicket, nuevoEstado, fechaCierre, fechaCreac
     }
 };
 
+// Funciones para obtener el nombre de un usuario
 const getUserName = async (req) => {
     try {
-        const id = req.query.id; // obtener el ID del usuario de la query
+        const id = req.query.id; 
         if (!id) {
             throw new Error('No se proporcionó un ID de usuario');
         }
@@ -179,10 +187,6 @@ const getUserName = async (req) => {
     }
 };
 
-
-
-
-
-//crearTablas();// Llamar a la función para crear las tablas
-
+//crearTablas();// Llamar a la función para crear las tablas, carga inicial del proyecto
+// exportamos las funciones y la conexion a la base de datos
 module.exports = { pool, crearUsuario, crearTablero, crearTicket, getTableros, getTickets, updateEstadoTicket, getUserName, crearTicket };

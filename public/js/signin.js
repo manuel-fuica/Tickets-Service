@@ -1,3 +1,4 @@
+// Evento submit del formulario de inicio de sesión
 document.getElementById('signinForm').addEventListener('submit', async (event) => {
     event.preventDefault();
 
@@ -16,11 +17,11 @@ document.getElementById('signinForm').addEventListener('submit', async (event) =
 
     if (response.ok) {
         const nombreUsuario = data.nombreUsuario; // Obtén el nombre del usuario desde la respuesta
-        const idUsuario = data.idUsuario;
+        const idUsuario = data.idUsuario; // Obtén el ID del usuario desde la respuesta
         const usuario = { nombre: nombreUsuario, id: idUsuario };
         sessionStorage.setItem('usuario', JSON.stringify(usuario)); // Almacena el nombre del usuario en la variable de sesión
         alert(data.message);
-        window.location.href = './home';
+        window.location.href = './home';// Redirige al usuario a la vista de home
     } else {
         alert(data.error);
     }

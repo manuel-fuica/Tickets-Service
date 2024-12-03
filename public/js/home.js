@@ -1,10 +1,11 @@
+// Obtiene el nombre del usuario desde la variable de sesión storage y lo muestra en el elemento con el id "nombre-usuario"
 const usuario = JSON.parse(sessionStorage.getItem('usuario'));
 const nombreUsuario = usuario.nombre;
 const elementoUsuario = document.getElementById('nombre-usuario');
 
 elementoUsuario.textContent = nombreUsuario;
 
-// Obtiene todos los elementos con la clase "cerrar-sesion" y agrega un evento de clic a cada uno
+// Obtiene todos los elementos con la clase "cerrar-sesion" y agrega un evento de clic a cada uno para cerrar la sesión
 const cerrarSesionButtons = document.querySelectorAll('.cerrar-sesion');
 for (let button of cerrarSesionButtons) {
     button.addEventListener('click', function() {
@@ -15,11 +16,13 @@ for (let button of cerrarSesionButtons) {
     });
 }
 
-let tableros; // Declarar tableros en un ámbito más amplio
+// Variable para almacenar los tableros
+let tableros;
 
+// Obtiene el contenedor de tableros
 const tablerosDiv = document.getElementById('tableros');
 
-// Obtener los tableros
+// Obtener los tableros mediante fetch y renderizarlos en el DOM 
 fetch('/tableros')
     .then(response => response.json())
     .then(data => {
@@ -45,6 +48,7 @@ fetch('/tableros')
     })
     .catch(error => console.error('Error:', error));
 
+    // Función para redirigir a la vista de nuevo ticket
 function rutaNuevoTicket(event) {
   const tableroId = event.target.getAttribute('data-tablero-id');
   console.log('ID del tablero:', tableroId);
@@ -62,8 +66,6 @@ function rutaNuevoTicket(event) {
     });
 }
 
-
-
 // Función para ver los tickets de un tablero
 function verTickets(id) {
     console.log('Se hizo clic en el botón Ver Tickets');
@@ -72,7 +74,7 @@ function verTickets(id) {
     const ticketsContainer = document.getElementById("tickets-container");
     ticketsContainer.innerHTML = ''; // Limpia el contenedor
 
-    // Obtener tickets del tablero
+    // Obtener tickets del tablero y mostrarlos en el DOM 
     fetch(`/tablero/${id}`)
         .then(response => response.json())
         .then(tickets => {
@@ -80,7 +82,7 @@ function verTickets(id) {
                 ticketsContainer.innerHTML = `
                     <h2>No hay tickets para ver</h2>
                     <p>No hay tickets registrados para el tablero seleccionado.</p>`;
-                verificarSiHayTickets();  // Solo se llama aquí
+                verificarSiHayTickets();
             } else {
                 const tableroNombre = tableros.find(tablero => tablero.id === id).nombre;
                 const htmlTickets = `
@@ -111,7 +113,7 @@ function verTickets(id) {
                     </div>
                   `;
                 ticketsContainer.innerHTML = htmlTickets;
-                verificarSiHayTickets();  // Aquí también
+                verificarSiHayTickets();
             }
         })
         .catch(error => console.error('Error al cargar los tickets:', error));
@@ -201,6 +203,7 @@ function ocultarMensajeNoHayTickets() {
     }
 }
 
+// Función para verificar si hay tickets, si no hay muestra un mensaje
 function verificarSiHayTickets() {
     const ticketsContainer = document.getElementById("tickets-container");
     if (!ticketsContainer.innerHTML.trim()) {

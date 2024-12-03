@@ -5,7 +5,10 @@
 - El proyecto consiste en un sistema de tickets para soporte tecnico, esta realizado con node.js, node express y conectado a la base de datos PostgreSQL
 - Se puede registrar si no tiene cuenta
 - Iniciar sesion con su cuenta registrada
-- Ver el home, el cual despliega los tableros activos, esto lo hace desde la base de datos PostgreSQL
+- Muestra un icono con el nombre del usuario que inicio sesion y si le das click cierra la sesion
+- Muestra el home, el cual despliega los tableros activos, esto lo hace desde la base de datos PostgreSQL
+- Puede cambiar el estado de los ticket y si pasan a cerrado muestra la fecha de cierre, si pasan a abierto o pendiente elimina la fecha de cierre
+- Puedes crear nuevos ticket, y dependiendo de donde crees el ticket toma el id del tablero, ademas usa el id del usuario que inicio sesion para guardar el ticket en la base de datos,puedes volver atras para ver el ticket y cambiar su estado
 
 ## Estructura:
 

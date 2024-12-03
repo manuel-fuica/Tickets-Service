@@ -2,7 +2,7 @@ const { pool } = require('../config/config');
 const { crearUsuario } = require('../config/config');
 
 
-
+// Funciones para crear los registros (usuarios)
 class Usuario {
     async create(nombre, email, password) {
         await crearUsuario(nombre, email, password);
@@ -14,5 +14,5 @@ class Usuario {
         return result.rows[0];
     }
 }
-
+// exportamos la clase
 module.exports =  Usuario;
