@@ -18,3 +18,5 @@
 - Carpeta js contiene la estructura front del proyecto para manejar los eventos y solicitudes
 - Carpeta vistas contiene las vistas html del navegador
 - Archivo server contiene el servidor y los endpoint para las solicitudes 
+
+## Dejo un Gif con las funcionalidades de la APP
