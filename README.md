@@ -20,4 +20,6 @@
 - Archivo server contiene el servidor y los endpoint para las solicitudes 
 
 ## Dejo un Gif con las funcionalidades de la APP
+
+- Esta en la carpeta public/img/Tickets-Service.gif
 ![Descripción del GIF](../Tickets-Service/public/img/Tickets-Service.gif)
